@@ -1,11 +1,22 @@
+import { db } from '../db';
+import { teamMembersTable } from '../db/schema';
 import { type CreateTeamMemberInput, type TeamMember } from '../schema';
 
 export const createTeamMember = async (input: CreateTeamMemberInput): Promise<TeamMember> => {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is creating a new team member and persisting it in the database.
-    return Promise.resolve({
-        id: 0, // Placeholder ID
-        name: input.name,
-        created_at: new Date() // Placeholder date
-    } as TeamMember);
+  try {
+    // Insert team member record
+    const result = await db.insert(teamMembersTable)
+      .values({
+        name: input.name
+      })
+      .returning()
+      .execute();
+
+    // Return the created team member
+    const teamMember = result[0];
+    return teamMember;
+  } catch (error) {
+    console.error('Team member creation failed:', error);
+    throw error;
+  }
 };
